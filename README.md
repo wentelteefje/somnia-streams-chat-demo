@@ -6,11 +6,9 @@ A simple chat example built on the **Somnia Data Streams** protocol.
 
 ## ⚙️ Setup
 
-### 1. Clone and install dependencies
+### 1. Install dependencies
 
 ```bash
-git clone https://github.com/<your-username>/<your-fork>.git
-cd <your-fork>
 npm install
 ```
 
