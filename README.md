@@ -20,7 +20,6 @@ touch .env.local
 
 Open it and add:
 ```bash
-RPC_URL=https://dream-rpc.somnia.network
 PRIVATE_KEY=0x<your_publisher_address_private_key>
 
 CHAT_SCHEMA_ID=0x80fda840ee61c587e4ca61af66e60ce19f0ac64ad923a25f0b061875c84c20f2

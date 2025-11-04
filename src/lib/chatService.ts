@@ -2,8 +2,7 @@
 import { SDK, SchemaEncoder, zeroBytes32 } from '@somnia-chain/streams'
 import { getPublicHttpClient, getWalletClient, publisherAddress } from './clients'
 import { waitForTransactionReceipt } from 'viem/actions'
-import { toHex, type Hex, type Hash, type Abi, parseAbiItem, encodeEventTopics, encodeAbiParameters } from 'viem'
-import { simulateContract } from 'viem/actions'
+import { toHex, type Hex, type Hash, parseAbiItem, encodeEventTopics, encodeAbiParameters } from 'viem'
 import { chatSchema } from './chatSchema'
 import { ensureChatEventSchema, CHAT_EVENT_ID, CHAT_EVENT_SIG } from './chatEvents'
 
@@ -48,16 +47,6 @@ export async function sendMessage(roomName: string, content: string, senderName:
   const sdk = getSdk(true)
   const schemaId = await ensureChatSchema()
   await ensureChatEventSchema()
-
-
-  // --- NEW: fetch protocol address & abi from the SDK ---
-  const proto = await sdk.streams.getSomniaDataStreamsProtocolInfo()
-  if (!proto || proto instanceof Error) {
-    throw new Error('Could not resolve Streams protocol address/ABI for this chain')
-  }
-  const protocolAddress = proto.address as `0x${string}`
-  const protocolAbi = proto.abi as Abi
-  // ---
 
   const roomId = toHex(roomName, { size: 32 })
   const now = Date.now().toString()

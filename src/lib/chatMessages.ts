@@ -46,9 +46,6 @@ export function useChatMessages(roomName?: string, limit = 100, refreshMs = 5000
         '0x0000000000000000000000000000000000000000'
       ) as `0x${string}`
 
-      // Debugging
-      // console.log('[useChatMessages] reading publisher:', publisher)
-
       // Try to read; treat NoData() as "no rows"
       let rows: unknown[] = []
       try {
