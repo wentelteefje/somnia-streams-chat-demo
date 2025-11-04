@@ -6,7 +6,25 @@ import { chatSchema } from './chatSchema'
 import type { ChatMsg } from './chatQuery'
 import { toHex } from 'viem'
 
-const val = (f) => f?.value?.value ?? f?.value
+const val = (f: any): any => f?.value?.value ?? f?.value
+
+// Robust detection of "NoData()" — no instanceof, just string matching across common fields.
+function isNoDataRevert(err: unknown): boolean {
+  try {
+    const parts: string[] = []
+    const anyErr = err as any
+    if (anyErr?.shortMessage) parts.push(String(anyErr.shortMessage))
+    if (anyErr?.message) parts.push(String(anyErr.message))
+    // viem BaseError often has a `details`/`metaMessages` array; add them if present
+    if (Array.isArray(anyErr?.metaMessages)) parts.push(anyErr.metaMessages.join(' | '))
+    if (anyErr?.cause?.message) parts.push(String(anyErr.cause.message))
+    if (anyErr?.cause?.shortMessage) parts.push(String(anyErr.cause.shortMessage))
+    const text = parts.join(' | ')
+    return /NoData\(\)/i.test(text)
+  } catch {
+    return false
+  }
+}
 
 /**
  * Fetch chat messages from Somnia Streams (read-only, auto-refresh, cumulative)
@@ -21,12 +39,28 @@ export function useChatMessages(roomName?: string, limit = 100, refreshMs = 5000
     try {
       const sdk = new SDK({ public: getPublicHttpClient() })
       const schemaId = await sdk.streams.computeSchemaId(chatSchema)
-      const publisher =
-        process.env.NEXT_PUBLIC_PUBLISHER_ADDRESS ||
-        '0x0000000000000000000000000000000000000000'
+      if (!schemaId) throw new Error('Failed to compute chat schemaId!')
 
-      const resp = await sdk.streams.getAllPublisherDataForSchema(schemaId, publisher)
-      const rows = Array.isArray(resp) ? (resp) : []
+      const publisher = (
+        process.env.NEXT_PUBLIC_PUBLISHER_ADDRESS ??
+        '0x0000000000000000000000000000000000000000'
+      ) as `0x${string}`
+
+      // Debugging
+      // console.log('[useChatMessages] reading publisher:', publisher)
+
+      // Try to read; treat NoData() as "no rows"
+      let rows: unknown[] = []
+      try {
+        const resp = await sdk.streams.getAllPublisherDataForSchema(schemaId, publisher)
+        rows = Array.isArray(resp) ? resp : []
+      } catch (e) {
+        if (isNoDataRevert(e)) {
+          rows = [] // nothing written yet — not an error
+        } else {
+          throw e
+        }
+      }
 
       const want = roomName
         ? toHex(roomName, { size: 32 }).toLowerCase()
@@ -73,7 +107,8 @@ export function useChatMessages(roomName?: string, limit = 100, refreshMs = 5000
       setError(null)
     } catch (err) {
       console.error('❌ Failed to load chat messages:', err)
-      setError(err.message || 'Failed to load messages')
+      // setError(err.message || 'Failed to load messages')
+      setError(err instanceof Error ? err.message : 'Failed to load messages')
     } finally {
       setLoading(false)
     }

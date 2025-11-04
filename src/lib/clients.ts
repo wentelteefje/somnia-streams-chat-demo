@@ -1,18 +1,15 @@
 // src/lib/clients.ts
-import { createPublicClient, createWalletClient, http } from 'viem'
+import { createPublicClient, createWalletClient, http, type PublicClient, type WalletClient } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import { somniaTestnet } from './chain'
 
-// const need = (k: 'RPC_URL' | 'PRIVATE_KEY') => {
-//   const v = process.env[k]
-//   if (!v) throw new Error(`Missing ${k} in .env.local`)
-//   return v
-// }
-
-let _pub: ReturnType<typeof createPublicClient> | null = null
-export function getPublicHttpClient() {
+let _pub: PublicClient | null = null
+export function getPublicHttpClient(): PublicClient {
   if (_pub) return _pub
-  _pub = createPublicClient({ chain: somniaTestnet, transport: http("https://dream-rpc.somnia.network/") })
+  _pub = createPublicClient({
+    chain: somniaTestnet,
+    transport: http('https://dream-rpc.somnia.network/'),
+  }) as unknown as PublicClient
   return _pub
 }
 
