@@ -1,15 +1,15 @@
 // src/lib/chatQuery.ts
-import { type Hex } from 'viem'
+import { type Hex } from "viem";
 
 export interface ChatMsg {
   /** Unix time in milliseconds */
-  timestamp: number
+  timestamp: number;
   /** 32-byte room id as hex (0x-prefixed) */
-  roomId: Hex
+  roomId: Hex;
   /** Message body */
-  content: string
+  content: string;
   /** Display name of the sender (free text) */
-  senderName: string
+  senderName: string;
   /** Sender wallet/address (0x-prefixed) */
-  sender: Hex
+  sender: Hex;
 }
