@@ -21,7 +21,7 @@ function getSdk(withWallet = false) {
 }
 
 // Computes the chat data schema id, registers it on-chain if missing, waits for receipt, and returns the id
-export async function ensureChatSchema(): Promise<`0x${string}`> {
+export async function ensureChatSchema(): Promise<Hex> {
   const sdk = getSdk(true);
 
   const id = await sdk.streams.computeSchemaId(chatSchema);

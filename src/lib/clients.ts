@@ -4,6 +4,7 @@ import {
   createWalletClient,
   http,
   type PublicClient,
+  type Hex,
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { somniaTestnet } from "./chain";
@@ -26,7 +27,7 @@ let _wallet: ReturnType<typeof createWalletClient> | null = null;
 export function getWalletClient() {
   if (_wallet) return _wallet;
   _wallet = createWalletClient({
-    account: privateKeyToAccount(process.env.PRIVATE_KEY as `0x${string}`),
+    account: privateKeyToAccount(process.env.PRIVATE_KEY as Hex),
     chain: somniaTestnet,
     transport: http("https://dream-rpc.somnia.network/"),
   });

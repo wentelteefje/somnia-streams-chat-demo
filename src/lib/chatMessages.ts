@@ -4,7 +4,7 @@ import { SDK } from "@somnia-chain/streams";
 import { getPublicHttpClient } from "./clients";
 import { chatSchema } from "./chatSchema";
 import type { ChatMsg } from "./chatQuery";
-import { toHex } from "viem";
+import { toHex, type Hex } from "viem";
 
 // Normalizes nested SDK field shapes into a primitive value
 const unwrapValue = (f: any): any => f?.value?.value ?? f?.value;
@@ -47,7 +47,7 @@ export function useChatMessages(
       if (!schemaId) throw new Error("Failed to compute chat schemaId!");
 
       const publisher = (process.env.NEXT_PUBLIC_PUBLISHER_ADDRESS ??
-        "0x0000000000000000000000000000000000000000") as `0x${string}`;
+        "0x0000000000000000000000000000000000000000") as Hex;
 
       // Try to read; treat NoData() as "no rows"
       let rows: unknown[] = [];
@@ -74,7 +74,7 @@ export function useChatMessages(
         if (!Array.isArray(row)) continue;
         const ts = Number(unwrapValue(row[0]));
         const ms = String(ts).length <= 10 ? ts * 1000 : ts;
-        const rid = String(unwrapValue(row[1])) as `0x${string}`;
+        const rid = String(unwrapValue(row[1])) as Hex;
         if (want && rid.toLowerCase() !== want) continue;
         newMessages.push({
           timestamp: ms,
@@ -83,7 +83,7 @@ export function useChatMessages(
           senderName: String(unwrapValue(row[3]) ?? ""),
           sender: String(
             unwrapValue(row[4]) ?? "0x0000000000000000000000000000000000000000"
-          ) as `0x${string}`,
+          ) as Hex,
         });
       }
 
