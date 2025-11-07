@@ -79,6 +79,5 @@ export async function sendMessage(
   );
   if (!tx) throw new Error("Failed to setAndEmitEvents");
   await waitForTransactionReceipt(getPublicHttpClient(), { hash: tx as Hash });
-
   return { txHash: tx };
 }
